@@ -1,0 +1,378 @@
+/* ================================================
+   agregar_producto.css
+   Estilos del botón "Agregar Producto" y del
+   formulario modal que se abre al hacer clic.
+
+   ¿QUÉ HACE ESTE ARCHIVO?
+   ─────────────────────────────────────────────
+   Define ÚNICAMENTE el aspecto visual del
+   formulario de agregar producto. No afecta
+   ningún otro elemento de index.html.
+   Se carga solo en index.html con <link>.
+================================================ */
+
+
+/* ── BOTÓN FLOTANTE "+" EN LA ESQUINA ────────────
+   Flota fijo en la esquina inferior derecha.
+   Al hacer clic llama a abrirFormProducto()
+   que está en agregar_producto.js
+──────────────────────────────────────────────── */
+.btn-agregar-flotante {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 150;
+
+  background: var(--rojo);
+  color: var(--negro);
+  border: none;
+  border-radius: 50px;          /* Cápsula */
+  padding: 14px 22px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  box-shadow: 0 6px 24px rgba(255, 215, 0, 0.25);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.btn-agregar-flotante:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 12px 32px rgba(255, 215, 0, 0.4);
+  background: var(--rojo-dark);
+}
+
+.btn-agregar-flotante .icono {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+
+/* ── FONDO OSCURO DEL MODAL ───────────────────────
+   Cubre toda la pantalla cuando el modal está abierto.
+   Al hacer clic en él se cierra el formulario.
+──────────────────────────────────────────────── */
+.ap-overlay {
+  display: none;                /* Oculto por defecto */
+  position: fixed;
+  inset: 0;                     /* top:0 right:0 bottom:0 left:0 */
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.ap-overlay.abierto {
+  display: flex;                /* Se muestra al abrir el formulario */
+}
+
+
+/* ── CAJA DEL FORMULARIO ──────────────────────────
+   El panel blanco/oscuro que contiene el form.
+──────────────────────────────────────────────── */
+.ap-modal {
+  background: var(--gris-dark);
+  border: 1px solid var(--gris-borde);
+  border-top: 4px solid var(--rojo);
+  border-radius: 16px;
+
+  width: 100%;
+  max-width: 580px;
+  max-height: 92vh;
+  overflow-y: auto;             /* Scroll si el form es muy largo */
+
+  padding: 28px;
+  animation: ap-entrada 0.25s ease;
+}
+
+/* Animación de aparición */
+@keyframes ap-entrada {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+
+/* ── CABECERA DEL MODAL ───────────────────────── */
+.ap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.ap-header h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.7rem;
+  letter-spacing: 2px;
+}
+
+.ap-header h2 span { color: var(--rojo); }
+
+.ap-btn-cerrar {
+  background: var(--gris-medio);
+  border: 1px solid var(--gris-borde);
+  color: var(--blanco);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.ap-btn-cerrar:hover {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: var(--negro);
+}
+
+
+/* ── GRUPOS DE CAMPOS ────────────────────────────
+   Cada campo tiene: label + input + mensaje de error
+──────────────────────────────────────────────── */
+.ap-grupo {
+  margin-bottom: 14px;
+}
+
+.ap-grupo label {
+  display: block;
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--suave, #cbd5e0);
+  margin-bottom: 5px;
+}
+
+.ap-grupo input,
+.ap-grupo select,
+.ap-grupo textarea {
+  width: 100%;
+  background: var(--gris-medio);
+  border: 1.5px solid var(--gris-borde);
+  color: var(--blanco);
+  padding: 11px 14px;
+  border-radius: 9px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: vertical;             /* Solo textarea puede cambiar de alto */
+}
+
+.ap-grupo input:focus,
+.ap-grupo select:focus,
+.ap-grupo textarea:focus {
+  border-color: var(--rojo);
+}
+
+.ap-grupo input::placeholder,
+.ap-grupo textarea::placeholder {
+  color: #3a5a7a;
+}
+
+/* Estado inválido (borde rojo) */
+.ap-grupo input.invalido,
+.ap-grupo select.invalido,
+.ap-grupo textarea.invalido {
+  border-color: #e31e24 !important;
+}
+
+/* Mensaje de error debajo del campo */
+.ap-err {
+  font-size: 0.73rem;
+  color: #ff6b6b;
+  margin-top: 4px;
+  display: none;
+}
+.ap-err.visible { display: block; }
+
+/* Opciones del select con fondo oscuro */
+.ap-grupo select option {
+  background: var(--gris-dark);
+}
+
+/* Fila de dos columnas (precio actual + precio antes) */
+.ap-fila2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+
+/* ── SELECTOR DE EMOJI ───────────────────────────
+   Fila de botones con emojis para elegir el ícono
+──────────────────────────────────────────────── */
+.ap-emojis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ap-emoji-btn {
+  background: var(--gris-medio);
+  border: 2px solid var(--gris-borde);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.1s;
+}
+
+.ap-emoji-btn:hover {
+  border-color: var(--rojo);
+  transform: scale(1.1);
+}
+
+.ap-emoji-btn.seleccionado {
+  border-color: var(--rojo);
+  background: rgba(255, 215, 0, 0.1);
+}
+
+
+/* ── ESPECIFICACIONES DINÁMICAS ──────────────────
+   Filas de "Nombre de spec" + "Valor" + botón X
+──────────────────────────────────────────────── */
+.ap-specs-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ap-spec-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr 36px;
+  gap: 8px;
+  align-items: center;
+}
+
+.ap-spec-fila input {
+  background: var(--gris-medio);
+  border: 1.5px solid var(--gris-borde);
+  color: var(--blanco);
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ap-spec-fila input:focus { border-color: var(--rojo); }
+.ap-spec-fila input::placeholder { color: #3a5a7a; }
+
+/* Botón X para eliminar una spec */
+.ap-btn-eliminar-spec {
+  background: transparent;
+  border: 1px solid #3a5a7a;
+  color: #3a5a7a;
+  width: 36px;
+  height: 36px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ap-btn-eliminar-spec:hover {
+  background: #e31e24;
+  border-color: #e31e24;
+  color: white;
+}
+
+/* Botón para agregar más specs */
+.ap-btn-add-spec {
+  background: transparent;
+  border: 1.5px dashed var(--gris-borde);
+  color: var(--suave, #cbd5e0);
+  padding: 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  width: 100%;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.ap-btn-add-spec:hover {
+  border-color: var(--rojo);
+  color: var(--rojo);
+}
+
+
+/* ── ALERTA DEL FORMULARIO ───────────────────────
+   Mensaje de error o éxito dentro del modal
+──────────────────────────────────────────────── */
+.ap-alerta {
+  padding: 12px 16px;
+  border-radius: 9px;
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+  display: none;
+  line-height: 1.6;
+}
+.ap-alerta.visible { display: block; }
+.ap-alerta.error   { background: rgba(227,30,36,0.1);  border: 1px solid #e31e24;      color: #ff8080; }
+.ap-alerta.exito   { background: rgba(0,184,148,0.1);  border: 1px solid var(--verde); color: #80ffdb; }
+
+/* Variable --verde para los estilos de éxito */
+:root { --verde: #00b894; --suave: #cbd5e0; }
+
+
+/* ── BOTÓN GUARDAR ───────────────────────────────
+   Botón principal de envío del formulario
+──────────────────────────────────────────────── */
+.ap-btn-guardar {
+  width: 100%;
+  background: var(--verde);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 6px;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.ap-btn-guardar:hover {
+  background: #00a381;
+  transform: translateY(-2px);
+}
+
+.ap-btn-guardar:disabled {
+  background: #1a3a5a;
+  color: #3a5a7a;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ── RESPONSIVE ──────────────────────────────────
+   En pantallas pequeñas las dos columnas se apilan
+──────────────────────────────────────────────── */
+@media (max-width: 500px) {
+  .ap-fila2    { grid-template-columns: 1fr; gap: 0; }
+  .ap-modal    { padding: 20px 16px; }
+  .ap-spec-fila { grid-template-columns: 1fr 1fr 32px; }
+  .btn-agregar-flotante { bottom: 20px; right: 20px; padding: 12px 18px; }
+}

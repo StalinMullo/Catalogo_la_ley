@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>La Ley — Mi Cuenta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --rojo:       #ffd700;
+      --rojo-dark:  #c5a500;
+      --negro:      #001529;
+      --gris-dark:  #001f3f;
+      --gris-medio: #002b52;
+      --gris-borde: #003a6d;
+      --blanco:     #f5f5f5;
+      --verde:      #00b894;
+      --suave:      #cbd5e0;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:'Barlow',sans-serif;
+      background:var(--negro);
+      color:var(--blanco);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background:var(--gris-dark);
+      border-bottom:3px solid var(--rojo);
+      padding:0 40px;
+      height:68px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .logo { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; color:var(--blanco); letter-spacing:3px; text-decoration:none; }
+    .logo span { color:var(--rojo); }
+    .header-link { color:var(--suave); text-decoration:none; font-size:0.85rem; transition:color 0.2s; }
+    .header-link:hover { color:var(--rojo); }
+
+    /* ── CENTRO ── */
+    .centro {
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 20px;
+      background:radial-gradient(ellipse at 50% 0%, rgba(255,215,0,0.06) 0%, transparent 60%);
+    }
+
+    /* ── CAJA ── */
+    .caja {
+      background:var(--gris-dark);
+      border:1px solid var(--gris-borde);
+      border-top:4px solid var(--rojo);
+      border-radius:16px;
+      width:100%;
+      max-width:480px;
+      padding:36px 36px 30px;
+      animation:bajar 0.3s ease;
+    }
+    @keyframes bajar {
+      from { transform:translateY(-14px); opacity:0; }
+      to   { transform:translateY(0);     opacity:1; }
+    }
+    .caja-titulo { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:3px; margin-bottom:4px; }
+    .caja-titulo span { color:var(--rojo); }
+    .caja-sub { color:var(--suave); font-size:0.88rem; margin-bottom:26px; }
+
+    /* ── TABS ── */
+    .tabs { display:flex; gap:6px; margin-bottom:24px; background:var(--gris-medio); border-radius:10px; padding:5px; }
+    .tab {
+      flex:1; padding:10px; border:none; border-radius:7px; background:transparent;
+      color:var(--suave); font-family:'Barlow',sans-serif; font-size:0.88rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:1px; cursor:pointer; transition:all 0.2s;
+    }
+    .tab.activo { background:var(--rojo); color:var(--negro); }
+
+    /* ── CAMPOS ── */
+    .campo { margin-bottom:15px; }
+    .campo label { display:block; font-size:0.73rem; text-transform:uppercase; letter-spacing:1px; color:var(--suave); margin-bottom:5px; }
+    .campo-inner { position:relative; }
+    .campo input {
+      width:100%; background:var(--gris-medio); border:1.5px solid var(--gris-borde);
+      color:var(--blanco); padding:12px 42px 12px 14px; border-radius:9px;
+      font-family:'Barlow',sans-serif; font-size:0.95rem; outline:none; transition:border-color 0.2s;
+    }
+    .campo input:focus { border-color:var(--rojo); }
+    .campo input::placeholder { color:#3a5a7a; }
+    .campo input.valido   { border-color:var(--verde); }
+    .campo input.invalido { border-color:#e31e24 !important; }
+    .campo-ico { position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:1rem; pointer-events:none; }
+    .campo-err { font-size:0.73rem; color:#ff6b6b; margin-top:4px; display:none; }
+    .campo-err.visible { display:block; }
+    .fila2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+    /* Barra fortaleza */
+    .fortaleza-barra { height:4px; background:var(--gris-borde); border-radius:2px; overflow:hidden; margin-top:5px; }
+    .fortaleza-fill  { height:100%; width:0%; border-radius:2px; transition:width 0.3s, background 0.3s; }
+    .fortaleza-txt   { font-size:0.72rem; color:var(--suave); margin-top:2px; }
+
+    /* ── BOTÓN ── */
+    .btn-submit {
+      width:100%; background:var(--rojo); color:var(--negro); border:none;
+      padding:15px; border-radius:10px; cursor:pointer; font-family:'Barlow',sans-serif;
+      font-weight:700; font-size:1rem; text-transform:uppercase; letter-spacing:1px;
+      margin-top:8px; transition:background 0.2s, transform 0.15s;
+    }
+    .btn-submit:hover  { background:var(--rojo-dark); transform:translateY(-2px); }
+    .btn-submit:disabled { background:#1a3a5a; color:#3a5a7a; cursor:not-allowed; transform:none; }
+
+    /* ── ALERTA ── */
+    .alerta { padding:12px 16px; border-radius:9px; font-size:0.88rem; margin-bottom:16px; display:none; line-height:1.6; }
+    .alerta.visible { display:block; }
+    .alerta.error   { background:rgba(227,30,36,0.1);  border:1px solid #e31e24; color:#ff8080; }
+    .alerta.exito   { background:rgba(0,184,148,0.1);  border:1px solid var(--verde); color:#80ffdb; }
+    .alerta.info    { background:rgba(255,215,0,0.08); border:1px solid var(--rojo); color:var(--rojo); }
+
+    /* ── CÓDIGO DE VERIFICACIÓN ── */
+    #sec-verificacion { display:none; }
+    .cod-info { text-align:center; color:var(--suave); font-size:0.88rem; margin-bottom:18px; line-height:1.7; }
+    .cod-info strong { color:var(--blanco); }
+
+    /* Caja amarilla con el código (visible en local) */
+    .caja-codigo-dev {
+      background:rgba(255,215,0,0.08);
+      border:2px dashed var(--rojo);
+      border-radius:10px;
+      padding:16px;
+      text-align:center;
+      margin-bottom:18px;
+      display:none;
+    }
+    .caja-codigo-dev p { font-size:0.78rem; color:var(--suave); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+    .caja-codigo-dev .cod-num { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--rojo); letter-spacing:12px; }
+    .caja-codigo-dev small { font-size:0.72rem; color:#ff6b6b; display:block; margin-top:4px; }
+
+    .input-cod { text-align:center !important; font-family:'Bebas Neue',sans-serif !important; font-size:2rem !important; letter-spacing:10px !important; }
+
+    /* ── ENLACE CAMBIAR FORM ── */
+    .cambiar { text-align:center; margin-top:18px; font-size:0.85rem; color:var(--suave); }
+    .cambiar a { color:var(--rojo); text-decoration:none; font-weight:700; }
+    .cambiar a:hover { text-decoration:underline; }
+
+    /* ── FOOTER ── */
+    footer { background:var(--gris-dark); border-top:1px solid var(--gris-borde); padding:18px 40px; text-align:center; color:var(--suave); font-size:0.82rem; }
+    footer strong { color:var(--rojo); }
+
+    @media(max-width:500px) {
+      .caja { padding:26px 18px 22px; }
+      .fila2 { grid-template-columns:1fr; gap:0; }
+      header { padding:0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">LA <span>LEY</span></a>
+  <a href="index.html" class="header-link">← Volver al catálogo</a>
+</header>
+
+<div class="centro">
+  <div class="caja">
+
+    <div class="caja-titulo">MI <span>CUENTA</span></div>
+    <div class="caja-sub">Accede o crea tu cuenta en La Ley</div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab activo" id="tab-login"    onclick="mostrarPanel('login')">Iniciar Sesión</button>
+      <button class="tab"        id="tab-registro" onclick="mostrarPanel('registro')">Registrarse</button>
+    </div>
+
+
+    <!-- ========================================
+         PANEL LOGIN
+    ======================================== -->
+    <div id="panel-login">
+      <div class="alerta" id="alerta-login"></div>
+
+      <div class="campo">
+        <label>Correo electrónico</label>
+        <div class="campo-inner">
+          <input type="email" id="l-correo" placeholder="ejemplo@correo.com" oninput="validarCorreo(this,'l-correo-err')"/>
+          <span class="campo-ico" id="l-correo-ico"></span>
+        </div>
+        <div class="campo-err" id="l-correo-err">Ingresa un correo válido</div>
+      </div>
+
+      <div class="campo">
+  <label>Contraseña</label>
+  <div class="campo-inner">
+    <input type="password" id="l-pass" placeholder="Tu contraseña" oninput="limpiarErr(this)"/>
+    <span class="campo-ico" onclick="togglePassAuth('l-pass', this)" 
+          style="cursor:pointer; pointer-events:all;">👁️</span>
+  </div>
+  <div class="campo-err" id="l-pass-err">Ingresa tu contraseña</div>
+</div>
+
+      <button class="btn-submit" id="btn-login" onclick="iniciarSesion()">Entrar a mi cuenta</button>
+      <div class="cambiar" style="margin-top:10px;">
+      <a href="#" onclick="mostrarPanel('recuperar')">¿Olvidaste tu contraseña?</a>
+      </div>
+      <div class="cambiar">¿No tienes cuenta? <a href="#" onclick="mostrarPanel('registro')">Regístrate aquí</a></div>
+    </div>
+
+
+    <!-- ========================================
+         PANEL REGISTRO
+    ======================================== -->
+    <div id="panel-registro" style="display:none">
+      <div class="alerta" id="alerta-registro"></div>
+
+      <!-- Sección formulario -->
+      <div id="sec-formulario">
+
+        <div class="fila2">
+          <div class="campo">
+            <label>Nombre</label>
+            <div class="campo-inner">
+              <input type="text" id="r-nombre" placeholder="Juan" oninput="validarLetras(this,'r-nombre-err','r-nombre-ico')"/>
+              <span class="campo-ico" id="r-nombre-ico"></span>
+            </div>
+            <div class="campo-err" id="r-nombre-err">Solo letras, sin números</div>
+          </div>
+          <div class="campo">
+            <label>Apellido</label>
+            <div class="campo-inner">
+              <input type="text" id="r-apellido" placeholder="Pérez" oninput="validarLetras(this,'r-apellido-err','r-apellido-ico')"/>
+              <span class="campo-ico" id="r-apellido-ico"></span>
+            </div>
+            <div class="campo-err" id="r-apellido-err">Solo letras, sin números</div>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Correo electrónico</label>
+          <div class="campo-inner">
+            <input type="email" id="r-correo" placeholder="ejemplo@correo.com" oninput="validarCorreo(this,'r-correo-err')"/>
+            <span class="campo-ico" id="r-correo-ico"></span>
+          </div>
+          <div class="campo-err" id="r-correo-err">Ingresa un correo válido (con @ y dominio)</div>
+        </div>
+
+        <div class="campo">
+          <label>Contraseña</label>
+          <div class="campo-inner">
+            <input type="password" id="r-pass" placeholder="Mínimo 6 caracteres" oninput="validarPass()"/>
+            <span class="campo-ico" onclick="togglePassAuth('r-pass', this)" 
+             style="cursor:pointer; pointer-events:all;">👁️</span>
+          </div>
+          <div class="fortaleza-barra"><div class="fortaleza-fill" id="f-fill"></div></div>
+          <div class="fortaleza-txt"  id="f-txt"></div>
+          <div class="campo-err" id="r-pass-err">Mínimo 6 caracteres</div>
+        </div>
+
+        <div class="campo">
+          <label>Verificar contraseña</label>
+          <div class="campo-inner">
+            <input type="password" id="r-pass2" placeholder="Repite tu contraseña" oninput="validarPass2()"/>
+            <span class="campo-ico" id="r-pass2-ico" onclick="togglePassAuth('r-pass2', this)" 
+            style="cursor:pointer; pointer-events:all;">👁️</span>
+          </div>
+          <div class="campo-err" id="r-pass2-err">Las contraseñas no coinciden</div>
+        </div>
+
+        <button class="btn-submit" id="btn-registro" onclick="registrar()">Crear cuenta y obtener código</button>
+
+      </div><!-- /sec-formulario -->
+
+      <!-- Sección verificación -->
+      <div id="sec-verificacion" style="display:none">
+
+        <!-- Caja que muestra el código en local (solo para pruebas) -->
+        <div class="caja-codigo-dev" id="caja-dev">
+          <p>📋 Tu código de verificación (solo visible en modo local)</p>
+          <div class="cod-num" id="dev-codigo">------</div>
+          <small>⚠️ En producción este código llegaría a tu correo</small>
+        </div>
+
+        <p class="cod-info">
+          Ingresa el código de 6 dígitos para activar tu cuenta.<br/>
+          Correo: <strong id="correo-mostrado"></strong>
+        </p>
+
+        <div class="campo">
+          <label>Código de verificación</label>
+          <div class="campo-inner">
+            <input type="text" id="r-codigo" class="input-cod" placeholder="000000"
+                   maxlength="6" oninput="soloNumeros(this)"/>
+          </div>
+          <div class="campo-err" id="r-codigo-err">El código debe tener exactamente 6 dígitos</div>
+        </div>
+
+        <button class="btn-submit" id="btn-verificar" onclick="verificarCodigo()">✅ Verificar y activar cuenta</button>
+
+      </div><!-- /sec-verificacion -->
+
+      <div class="cambiar">¿Ya tienes cuenta? <a href="#" onclick="mostrarPanel('login')">Inicia sesión</a></div>
+    </div><!-- /panel-registro -->
+<!-- ========================================
+         PANEL RECUPERAR CONTRASEÑA
+    ======================================== -->
+    <div id="panel-recuperar" style="display:none">
+      <div class="alerta" id="alerta-recuperar"></div>
+
+      <!-- PASO 1: Ingresar correo -->
+      <div id="rec-paso1">
+        <p style="color:var(--suave); font-size:0.88rem; margin-bottom:18px; line-height:1.6;">
+          Ingresa tu correo y te daremos un código para restablecer tu contraseña.
+        </p>
+
+        <div class="campo">
+          <label>Correo electrónico</label>
+          <div class="campo-inner">
+            <input type="email" id="rec-correo" placeholder="ejemplo@correo.com"
+                   oninput="validarCorreo(this,'rec-correo-err')"/>
+            <span class="campo-ico" id="rec-correo-ico"></span>
+          </div>
+          <div class="campo-err" id="rec-correo-err">Ingresa un correo válido</div>
+        </div>
+
+        <button class="btn-submit" id="btn-recuperar" onclick="solicitarCodigo()">
+          Obtener código
+        </button>
+      </div>
+
+      <!-- PASO 2: Código + nueva contraseña -->
+      <div id="rec-paso2" style="display:none">
+
+        <!-- Caja con el código (solo local) -->
+        <div class="caja-codigo-dev" id="rec-caja-dev">
+          <p>📋 Tu código de recuperación (solo visible en modo local)</p>
+          <div class="cod-num" id="rec-codigo-dev">------</div>
+          <small>⚠️ En producción este código llegaría a tu correo</small>
+        </div>
+
+        <p class="cod-info">
+          Ingresa el código de 6 dígitos y tu nueva contraseña.<br/>
+          Correo: <strong id="rec-correo-mostrado"></strong>
+        </p>
+
+        <div class="campo">
+          <label>Código de verificación</label>
+          <div class="campo-inner">
+            <input type="text" id="rec-codigo" class="input-cod" placeholder="000000"
+                   maxlength="6" oninput="soloNumeros(this)"/>
+          </div>
+          <div class="campo-err" id="rec-codigo-err">El código debe tener 6 dígitos</div>
+        </div>
+
+        <div class="campo">
+          <label>Nueva contraseña</label>
+          <div class="campo-inner">
+            <input type="password" id="rec-nueva" placeholder="Mínimo 6 caracteres"/>
+            <span class="campo-ico" onclick="togglePassAuth('rec-nueva', this)"
+             style="cursor:pointer; pointer-events:all;">👁️</span>
+          </div>
+          <div class="campo-err" id="rec-nueva-err">Mínimo 6 caracteres</div>
+        </div>
+
+        <div class="campo">
+          <label>Confirmar nueva contraseña</label>
+          <div class="campo-inner">
+            <input type="password" id="rec-confirma" placeholder="Repite la contraseña"/>
+            <span class="campo-ico" onclick="togglePassAuth('rec-confirma', this)"
+            style="cursor:pointer; pointer-events:all;">👁️</span>
+          </div>
+          <div class="campo-err" id="rec-confirma-err">Las contraseñas no coinciden</div>
+        </div>
+
+        <button class="btn-submit" id="btn-restablecer" onclick="restablecerPassword()">
+          🔑 Restablecer contraseña
+        </button>
+      </div>
+
+      <div class="cambiar">
+        <a href="#" onclick="mostrarPanel('login')">← Volver al inicio de sesión</a>
+      </div>
+    </div><!-- /panel-recuperar -->
+  </div><!-- /caja -->
+</div><!-- /centro -->
+
+<footer>
+  <strong>LA LEY</strong> — Equipos de Cómputo &nbsp;|&nbsp; Ambato, Ecuador &nbsp;|&nbsp; © 2025
+</footer>
+
+
+<script>
+// ================================================
+//  VARIABLES GLOBALES
+// ================================================
+let correoRegistrado = '';
+
+
+// ================================================
+//  CAMBIAR ENTRE PANELES
+// ================================================
+function mostrarPanel(panel) {
+  document.getElementById('panel-login').style.display    = panel === 'login'    ? 'block' : 'none';
+  document.getElementById('panel-registro').style.display = panel === 'registro' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('activo',    panel === 'login');
+  document.getElementById('tab-registro').classList.toggle('activo', panel === 'registro');
+  ocultarAlertas();
+}
+
+function ocultarAlertas() {
+  document.querySelectorAll('.alerta').forEach(function(a) {
+    a.className = 'alerta';
+    a.innerHTML = '';
+  });
+}
+
+function mostrarAlerta(id, tipo, msg) {
+  const el = document.getElementById(id);
+  el.className = 'alerta visible ' + tipo;
+  el.innerHTML = msg;
+}
+
+
+// ================================================
+//  VALIDACIONES EN TIEMPO REAL
+// ================================================
+
+// Solo letras — bloquea números mientras escribe
+function validarLetras(input, errId, icoId) {
+  // Borrar el carácter si no es letra o espacio
+  input.value = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
+
+  const ok  = input.value.trim().length >= 2;
+  const ico = document.getElementById(icoId);
+  const err = document.getElementById(errId);
+
+  input.classList.toggle('valido',   ok);
+  input.classList.toggle('invalido', !ok && input.value.length > 0);
+  if (ico) ico.textContent = ok ? '✅' : '';
+  if (err) err.classList.toggle('visible', !ok && input.value.length > 0);
+}
+
+// Validar correo
+function validarCorreo(input, errId) {
+  const val = input.value.trim();
+  const ok  = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val);
+  const ico = input.parentElement.querySelector('.campo-ico');
+  const err = document.getElementById(errId);
+
+  input.classList.toggle('valido',   ok);
+  input.classList.toggle('invalido', !ok && val.length > 0);
+  if (ico) ico.textContent = ok ? '✅' : val.length > 0 ? '❌' : '';
+  if (err) err.classList.toggle('visible', !ok && val.length > 0);
+}
+
+// Solo números (para el código)
+function soloNumeros(input) {
+  input.value = input.value.replace(/\D/g, '');
+}
+
+// Limpiar error al escribir
+function limpiarErr(input) {
+  input.classList.remove('invalido');
+}
+
+// Fortaleza de contraseña
+function validarPass() {
+  const val  = document.getElementById('r-pass').value;
+  const fill = document.getElementById('f-fill');
+  const txt  = document.getElementById('f-txt');
+  const err  = document.getElementById('r-pass-err');
+
+  let fuerza = 0;
+  if (val.length >= 6)           fuerza++;
+  if (val.length >= 10)          fuerza++;
+  if (/[A-Z]/.test(val))         fuerza++;
+  if (/[0-9]/.test(val))         fuerza++;
+  if (/[^a-zA-Z0-9]/.test(val))  fuerza++;
+
+  const colores = ['#e31e24','#e8823a','#e8d63a','#6ac05a','#00b894'];
+  const textos  = ['Muy débil','Débil','Regular','Fuerte','Muy fuerte'];
+  const pcts    = [20, 40, 60, 80, 100];
+
+  if (val.length > 0) {
+    const i = Math.min(fuerza - 1, 4);
+    fill.style.width      = pcts[Math.max(i, 0)] + '%';
+    fill.style.background = colores[Math.max(i, 0)];
+    txt.textContent       = textos[Math.max(i, 0)];
+  } else {
+    fill.style.width = '0%';
+    txt.textContent  = '';
+  }
+
+  const ok = val.length >= 6;
+  document.getElementById('r-pass').classList.toggle('valido',   ok);
+  document.getElementById('r-pass').classList.toggle('invalido', !ok && val.length > 0);
+  err.classList.toggle('visible', !ok && val.length > 0);
+
+  if (document.getElementById('r-pass2').value) validarPass2();
+}
+
+// Verificar que las contraseñas coincidan
+function validarPass2() {
+  const p1  = document.getElementById('r-pass').value;
+  const p2  = document.getElementById('r-pass2').value;
+  const ico = document.getElementById('r-pass2-ico');
+  const err = document.getElementById('r-pass2-err');
+  const ok  = p1 === p2 && p2.length >= 6;
+
+  document.getElementById('r-pass2').classList.toggle('valido',   ok);
+  document.getElementById('r-pass2').classList.toggle('invalido', !ok && p2.length > 0);
+  ico.textContent = ok ? '✅' : p2.length > 0 ? '❌' : '';
+  err.classList.toggle('visible', !ok && p2.length > 0);
+}
+
+
+// ================================================
+//  INICIAR SESIÓN
+// ================================================
+async function iniciarSesion() {
+  ocultarAlertas();
+
+  const correo = document.getElementById('l-correo').value.trim();
+  const pass   = document.getElementById('l-pass').value;
+  let err = false;
+
+  if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo)) {
+    document.getElementById('l-correo').classList.add('invalido');
+    document.getElementById('l-correo-err').classList.add('visible');
+    err = true;
+  }
+  if (!pass) {
+    document.getElementById('l-pass').classList.add('invalido');
+    document.getElementById('l-pass-err').classList.add('visible');
+    err = true;
+  }
+  if (err) return;
+
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.textContent = '⏳ Verificando...';
+
+  try {
+    const res  = await fetch('login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ correo, password: pass })
+    });
+    const data = await res.json();
+
+   if (data.success) {
+      mostrarAlerta('alerta-login', 'exito', '✅ ' + data.mensaje + ' Redirigiendo...');
+      
+      localStorage.setItem('usuario_nombre', data.usuario.nombre);
+      localStorage.setItem('usuario_correo', data.usuario.correo);
+      localStorage.setItem('sesion_laley', JSON.stringify({
+        id:     data.usuario.id,
+        nombre: data.usuario.nombre,
+        correo: data.usuario.correo,
+        rol:    data.rol
+      }));
+      setTimeout(function() { window.location.href = 'index.html'; }, 1500);
+      } else {
+      let msg = '❌ ' + data.mensaje;
+      if (data.no_existe) {
+        msg += ' <a href="#" onclick="mostrarPanel(\'registro\')" style="color:var(--rojo)">→ Regístrate</a>';
+      }
+      mostrarAlerta('alerta-login', 'error', msg);
+      btn.disabled    = false;
+      btn.textContent = 'Entrar a mi cuenta';
+    }
+  } catch(e) {
+    mostrarAlerta('alerta-login', 'error', '❌ No se pudo conectar. ¿Está XAMPP encendido y los archivos PHP en la carpeta correcta?');
+    btn.disabled    = false;
+    btn.textContent = 'Entrar a mi cuenta';
+  }
+}
+
+
+// ================================================
+//  REGISTRAR USUARIO
+// ================================================
+async function registrar() {
+  ocultarAlertas();
+
+  const nombre   = document.getElementById('r-nombre').value.trim();
+  const apellido = document.getElementById('r-apellido').value.trim();
+  const correo   = document.getElementById('r-correo').value.trim();
+  const pass     = document.getElementById('r-pass').value;
+  const pass2    = document.getElementById('r-pass2').value;
+  let err = false;
+
+  // Validar nombre
+  if (!nombre || !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(nombre)) {
+    document.getElementById('r-nombre').classList.add('invalido');
+    document.getElementById('r-nombre-err').classList.add('visible');
+    err = true;
+  }
+  // Validar apellido
+  if (!apellido || !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/.test(apellido)) {
+    document.getElementById('r-apellido').classList.add('invalido');
+    document.getElementById('r-apellido-err').classList.add('visible');
+    err = true;
+  }
+  // Validar correo
+  if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo)) {
+    document.getElementById('r-correo').classList.add('invalido');
+    document.getElementById('r-correo-err').classList.add('visible');
+    err = true;
+  }
+  // Validar contraseña
+  if (!pass || pass.length < 6) {
+    document.getElementById('r-pass').classList.add('invalido');
+    document.getElementById('r-pass-err').classList.add('visible');
+    err = true;
+  }
+  // Validar que coincidan
+  if (pass !== pass2) {
+    document.getElementById('r-pass2').classList.add('invalido');
+    document.getElementById('r-pass2-err').classList.add('visible');
+    err = true;
+  }
+
+  if (err) {
+    mostrarAlerta('alerta-registro', 'error', '❌ Corrige los campos marcados antes de continuar.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-registro');
+  btn.disabled = true;
+  btn.textContent = '⏳ Creando cuenta...';
+
+  try {
+    const res  = await fetch('registro.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre, apellido, correo, password: pass, password2: pass2 })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      correoRegistrado = data.correo;
+
+      // Mostrar el código en pantalla (solo para pruebas en XAMPP local)
+      if (data.codigo_dev) {
+        document.getElementById('dev-codigo').textContent = data.codigo_dev;
+        document.getElementById('caja-dev').style.display = 'block';
+      }
+
+      document.getElementById('correo-mostrado').textContent = data.correo;
+      document.getElementById('sec-formulario').style.display    = 'none';
+      document.getElementById('sec-verificacion').style.display  = 'block';
+      mostrarAlerta('alerta-registro', 'info', '📋 ' + data.mensaje);
+    } else {
+      mostrarAlerta('alerta-registro', 'error', '❌ ' + data.mensaje);
+      // Marcar el campo que tiene error
+      if (data.campo && data.campo !== 'general') {
+        const campo = document.getElementById('r-' + data.campo);
+        if (campo) campo.classList.add('invalido');
+      }
+      btn.disabled    = false;
+      btn.textContent = 'Crear cuenta y obtener código';
+    }
+  } catch(e) {
+    mostrarAlerta('alerta-registro', 'error', '❌ No se pudo conectar. ¿Está XAMPP encendido y los archivos PHP en la carpeta correcta?');
+    btn.disabled    = false;
+    btn.textContent = 'Crear cuenta y obtener código';
+  }
+}
+
+
+// ================================================
+//  VERIFICAR CÓDIGO
+// ================================================
+async function verificarCodigo() {
+  const codigo = document.getElementById('r-codigo').value.trim();
+  const errEl  = document.getElementById('r-codigo-err');
+  const btn    = document.getElementById('btn-verificar');
+
+  // Validar que tenga 6 dígitos numéricos
+  if (!/^\d{6}$/.test(codigo)) {
+    document.getElementById('r-codigo').classList.add('invalido');
+    errEl.classList.add('visible');
+    return;
+  }
+  document.getElementById('r-codigo').classList.remove('invalido');
+  errEl.classList.remove('visible');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Verificando...';
+
+  try {
+    const res  = await fetch('verificar.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ correo: correoRegistrado, codigo: codigo })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      mostrarAlerta('alerta-registro', 'exito',
+        '🎉 ¡Cuenta activada, ' + (data.nombre || '') + '! Redirigiendo al inicio de sesión...');
+      setTimeout(function() { mostrarPanel('login'); }, 2000);
+    } else {
+      mostrarAlerta('alerta-registro', 'error', '❌ ' + data.mensaje);
+      btn.disabled    = false;
+      btn.textContent = '✅ Verificar y activar cuenta';
+    }
+  } catch(e) {
+    mostrarAlerta('alerta-registro', 'error', '❌ Error de conexión.');
+    btn.disabled    = false;
+    btn.textContent = '✅ Verificar y activar cuenta';
+  }
+}
+// ================================================
+//  RECUPERAR CONTRASEÑA
+// ================================================
+let correoRecuperacion = '';
+
+function mostrarPanel(panel) {
+  document.getElementById('panel-login').style.display     = panel === 'login'     ? 'block' : 'none';
+  document.getElementById('panel-registro').style.display  = panel === 'registro'  ? 'block' : 'none';
+  document.getElementById('panel-recuperar').style.display = panel === 'recuperar' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('activo',    panel === 'login');
+  document.getElementById('tab-registro').classList.toggle('activo', panel === 'registro');
+  ocultarAlertas();
+}
+
+async function solicitarCodigo() {
+  const correo = document.getElementById('rec-correo').value.trim();
+
+  if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo)) {
+    document.getElementById('rec-correo').classList.add('invalido');
+    document.getElementById('rec-correo-err').classList.add('visible');
+    return;
+  }
+
+  const btn = document.getElementById('btn-recuperar');
+  btn.disabled    = true;
+  btn.textContent = '⏳ Enviando...';
+
+  try {
+    const res  = await fetch('recuperar_password.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ correo })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      correoRecuperacion = data.correo;
+      document.getElementById('rec-correo-mostrado').textContent = data.correo;
+      if (data.codigo_dev) {
+        document.getElementById('rec-codigo-dev').textContent = data.codigo_dev;
+        document.getElementById('rec-caja-dev').style.display = 'block';
+      }
+      document.getElementById('rec-paso1').style.display = 'none';
+      document.getElementById('rec-paso2').style.display = 'block';
+      mostrarAlerta('alerta-recuperar', 'info', '📋 ' + data.mensaje);
+    } else {
+      mostrarAlerta('alerta-recuperar', 'error', '❌ ' + data.mensaje);
+      if (data.campo === 'correo') {
+        document.getElementById('rec-correo').classList.add('invalido');
+      }
+      btn.disabled    = false;
+      btn.textContent = 'Obtener código';
+    }
+  } catch(e) {
+    mostrarAlerta('alerta-recuperar', 'error', '❌ No se pudo conectar al servidor.');
+    btn.disabled    = false;
+    btn.textContent = 'Obtener código';
+  }
+}
+
+async function restablecerPassword() {
+  const codigo   = document.getElementById('rec-codigo').value.trim();
+  const nueva    = document.getElementById('rec-nueva').value;
+  const confirma = document.getElementById('rec-confirma').value;
+  let hayError   = false;
+
+  if (!/^\d{6}$/.test(codigo)) {
+    document.getElementById('rec-codigo').classList.add('invalido');
+    document.getElementById('rec-codigo-err').classList.add('visible');
+    hayError = true;
+  }
+  if (!nueva || nueva.length < 6) {
+    document.getElementById('rec-nueva').classList.add('invalido');
+    document.getElementById('rec-nueva-err').classList.add('visible');
+    hayError = true;
+  }
+  if (nueva !== confirma) {
+    document.getElementById('rec-confirma').classList.add('invalido');
+    document.getElementById('rec-confirma-err').classList.add('visible');
+    hayError = true;
+  }
+  if (hayError) return;
+
+  const btn = document.getElementById('btn-restablecer');
+  btn.disabled    = true;
+  btn.textContent = '⏳ Restableciendo...';
+
+  try {
+    const res  = await fetch('restablecer_password.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        correo:   correoRecuperacion,
+        codigo:   codigo,
+        nueva:    nueva,
+        confirma: confirma
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      mostrarAlerta('alerta-recuperar', 'exito', '✅ ' + data.mensaje);
+      setTimeout(function() { mostrarPanel('login'); }, 2500);
+    } else {
+      mostrarAlerta('alerta-recuperar', 'error', '❌ ' + data.mensaje);
+      btn.disabled    = false;
+      btn.textContent = '🔑 Restablecer contraseña';
+    }
+  } catch(e) {
+    mostrarAlerta('alerta-recuperar', 'error', '❌ No se pudo conectar al servidor.');
+    btn.disabled    = false;
+    btn.textContent = '🔑 Restablecer contraseña';
+  }
+}
+function togglePassAuth(inputId, icono) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type        = 'text';
+        icono.textContent = '🙈';
+    } else {
+        input.type        = 'password';
+        icono.textContent = '👁️';
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>La Ley — Mi Carrito</title>
+
+  <!-- Tipografías -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Estilos del carrito (archivo separado) -->
+  <link rel="stylesheet" href="carrito.css"/>
+</head>
+<body>
+
+  <!-- =============================================
+       HEADER
+  ============================================== -->
+  <header>
+    <!-- Logo con enlace de regreso al catálogo -->
+    <a href="index.html" class="logo">LA <span>LEY</span></a>
+    <div class="header-titulo">Mi Carrito 🛒</div>
+    <!-- Botón para volver al catálogo -->
+    <a href="index.html" class="btn-volver">← Seguir comprando</a>
+  </header>
+
+
+  <!-- =============================================
+       CONTENIDO PRINCIPAL
+  ============================================== -->
+  <main class="main-carrito">
+
+    <!-- COLUMNA IZQUIERDA: lista de productos -->
+    <section class="columna-productos">
+
+      <div class="seccion-titulo">
+        <h2>Productos en tu carrito</h2>
+        <span id="contador-items">0 productos</span>
+      </div>
+
+      <!-- Aquí se renderizan los productos con JavaScript -->
+      <div id="lista-carrito"></div>
+
+      <!-- Botón para vaciar todo el carrito -->
+      <button class="btn-vaciar" id="btn-vaciar" onclick="vaciarCarrito()" style="display:none">
+        🗑️ Vaciar carrito completo
+      </button>
+
+    </section>
+
+
+    <!-- COLUMNA DERECHA: resumen y pago -->
+    <aside class="columna-resumen">
+
+      <div class="resumen-box">
+        <h3 class="resumen-titulo">Resumen del pedido</h3>
+
+        <!-- Desglose de precios -->
+        <div class="resumen-linea">
+          <span>Subtotal</span>
+          <span id="r-subtotal">$0.00</span>
+        </div>
+        <div class="resumen-linea">
+          <span>Envío</span>
+          <span id="r-envio" class="envio-gratis">GRATIS</span>
+        </div>
+        <div class="resumen-linea">
+          <span>IVA (15%)</span>
+          <span id="r-iva">$0.00</span>
+        </div>
+
+        <div class="resumen-separador"></div>
+
+        <!-- Total final -->
+        <div class="resumen-total">
+          <span>TOTAL A PAGAR</span>
+          <span id="r-total">$0.00</span>
+        </div>
+
+        <!-- Botón de pago -->
+        <button class="btn-pagar" id="btn-pagar" onclick="abrirPago()">
+          💳 Proceder al Pago
+        </button>
+
+        <!-- Métodos de pago aceptados -->
+        <div class="metodos-pago">
+          <span>Aceptamos:</span>
+          <div class="iconos-pago">
+            <span class="pago-chip">💳 Tarjeta</span>
+            <span class="pago-chip">🏦 Transferencia</span>
+            <span class="pago-chip">💵 Efectivo</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Enlace para continuar comprando -->
+      <a href="index.html" class="link-continuar">
+        ← Continuar explorando el catálogo
+      </a>
+
+    </aside>
+
+  </main>
+
+
+  <!-- =============================================
+       MODAL DE PAGO - Se abre al hacer clic en Pagar
+  ============================================== -->
+  <div class="pago-overlay" id="pago-overlay" onclick="cerrarPago(event)">
+    <div class="pago-modal">
+
+      <!-- Cabecera -->
+      <div class="pago-header">
+        <h2>💳 Finalizar Compra</h2>
+        <button class="btn-cerrar-pago" onclick="cerrarPago(true)">✕</button>
+      </div>
+
+      <!-- Resumen rápido -->
+      <div class="pago-resumen" id="pago-resumen"></div>
+
+      <!-- Formulario de datos del cliente -->
+      <div class="pago-form">
+        <h3>Tus datos de contacto</h3>
+
+        <div class="form-grupo">
+          <label>Nombre completo</label>
+          <input type="text" id="p-nombre" placeholder="Ej: Juan Pérez"/>
+        </div>
+
+        <div class="form-grupo">
+          <label>Teléfono / WhatsApp</label>
+          <input type="tel" id="p-telefono" placeholder="Ej: 0998765432"/>
+        </div>
+
+        <div class="form-grupo">
+          <label>Correo electrónico</label>
+          <input type="email" id="p-correo" placeholder="Ej: juan@gmail.com"/>
+        </div>
+
+        <div class="form-grupo">
+          <label>Dirección de entrega</label>
+          <input type="text" id="p-direccion" placeholder="Ej: Av. Cevallos y Montalvo, Ambato"/>
+        </div>
+
+        <div class="form-grupo">
+          <label>Método de pago</label>
+          <select id="p-metodo">
+            <option value="">-- Selecciona --</option>
+            <option value="tarjeta">💳 Tarjeta de crédito/débito</option>
+            <option value="transferencia">🏦 Transferencia bancaria</option>
+            <option value="efectivo">💵 Pago en efectivo</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Botón confirmar pedido -->
+      <button class="btn-confirmar" onclick="confirmarPedido()">
+        ✅ Confirmar Pedido
+      </button>
+
+    </div>
+  </div>
+
+
+  <!-- =============================================
+       MODAL DE ÉXITO - Aparece al confirmar
+  ============================================== -->
+  <div class="exito-overlay" id="exito-overlay">
+    <div class="exito-modal">
+      <div class="exito-icono">🎉</div>
+      <h2>¡Pedido Confirmado!</h2>
+      <p id="exito-mensaje"></p>
+      <button class="btn-exito" onclick="window.location.href='index.html'">
+        Volver al catálogo
+      </button>
+    </div>
+  </div>
+
+
+  <!-- JavaScript del carrito -->
+  <script src="carrito.js"></script>
+
+</body>
+</html>

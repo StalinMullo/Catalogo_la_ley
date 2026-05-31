@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>La Ley - Catálogo de Equipos</title>
+
+  <!-- Google Fonts (tipografías) -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Archivo de estilos CSS -->
+  <link rel="stylesheet" href="estilos.css"/>
+  <link rel="stylesheet" href="agregar_producto.css"/>
+  <link rel="stylesheet" href="mi_cuenta.css"/>
+  <link rel="stylesheet" href="cambiar_password.css"/>
+</head>
+<body>
+
+  <!-- =============================================
+       ENCABEZADO - Barra superior fija
+  ============================================== -->
+  <header>
+    <div class="logo">LA <span>LEY</span></div>
+
+    <!-- Botones de navegación por categoría -->
+    <nav>
+      <button class="activo" onclick="filtrarCategoria('todos', this)">Todos</button>
+      <button onclick="filtrarCategoria('laptop', this)">Laptops</button>
+      <button onclick="filtrarCategoria('pc', this)">PC</button>
+      <button onclick="filtrarCategoria('periférico', this)">Periféricos</button>
+      <button onclick="filtrarCategoria('impresora', this)">Impresoras</button>
+    </nav>
+
+    <!-- Botón del carrito (esquina derecha del header) -->
+    <button class="btn-carrito" onclick="irAlCarrito()">
+      🛒 <span>Carrito</span>
+      <div class="carrito-badge" id="carrito-badge">0</div>
+    </button>
+    <button class="btn-cerrar-sesion" id="btn-cerrar-sesion" 
+        onclick="cerrarSesion()" style="display:none">
+  🔓 Salir
+</button>
+<button class="btn-mi-cuenta" id="btn-mi-cuenta"
+        onclick="abrirMiCuenta()" style="display:none">
+  👤 Mi Cuenta
+</button>
+  </header>
+  
+
+
+  <!-- =============================================
+       SECCIÓN HERO - Título principal y buscador
+  ============================================== -->
+  <section class="hero">
+    <h1>CATÁLOGO DE<br/><em>EQUIPOS DE CÓMPUTO</em></h1>
+    <p>Los mejores equipos tecnológicos al mejor precio. Encuentra lo que necesitas para estudiar, trabajar o jugar.</p>
+
+    <!-- Barra de búsqueda -->
+    <div class="buscador-wrap">
+      <input
+        type="text"
+        id="buscador"
+        placeholder="Buscar equipo, marca, modelo..."
+        oninput="buscar(this.value)"
+      />
+      <span class="icon-search">🔍</span>
+    </div>
+  </section>
+
+
+  <!-- =============================================
+       ESTADÍSTICAS - Números destacados
+  ============================================== -->
+  <section class="stats">
+    <div class="stat">
+      <div class="num" id="st-total">18</div>
+      <div class="lbl">Productos</div>
+    </div>
+    <div class="stat">
+      <div class="num">5</div>
+      <div class="lbl">Categorías</div>
+    </div>
+    <div class="stat">
+      <div class="num">✓</div>
+      <div class="lbl">Garantía</div>
+    </div>
+    <div class="stat">
+      <div class="num">📦</div>
+      <div class="lbl">Envío a todo Ecuador</div>
+    </div>
+  </section>
+
+
+  <!-- =============================================
+       BARRA DE FILTROS - Precio y ordenamiento
+  ============================================== -->
+  <div class="filtros-bar">
+    <span>Filtrar:</span>
+    <button class="activo" onclick="filtrarPrecio('todos', this)">Todos los precios</button>
+    <button onclick="filtrarPrecio('bajo', this)">Hasta $500</button>
+    <button onclick="filtrarPrecio('medio', this)">$500 – $1000</button>
+    <button onclick="filtrarPrecio('alto', this)">Más de $1000</button>
+
+    <!-- Menú desplegable para ordenar -->
+    <select class="orden-select" onchange="ordenar(this.value)">
+      <option value="default">Ordenar por…</option>
+      <option value="precio-asc">Precio: menor a mayor</option>
+      <option value="precio-desc">Precio: mayor a menor</option>
+      <option value="nombre">Nombre A-Z</option>
+    </select>
+  </div>
+
+
+  <!-- =============================================
+       CATÁLOGO - Aquí aparecen las tarjetas
+  ============================================== -->
+  <section class="grid-section">
+    <!-- Contador de resultados -->
+    <div class="conteo">
+      Mostrando <strong id="n-resultados">18</strong> productos
+    </div>
+
+    <!-- Las tarjetas se generan con JavaScript -->
+    <div class="grid" id="grid"></div>
+
+    <!-- Mensaje cuando no hay resultados -->
+    <div class="no-result" id="no-result" style="display:none">
+      <div>😕</div>
+      <p>No se encontraron productos con ese criterio.<br/>Intenta con otra búsqueda.</p>
+    </div>
+  </section>
+
+
+  <!-- =============================================
+       PIE DE PÁGINA
+  ============================================== -->
+  <footer>
+    <strong>LA LEY</strong> — Equipos de Cómputo &nbsp;|&nbsp; Ambato, Ecuador &nbsp;|&nbsp; © 2025
+  </footer>
+
+
+  <!-- =============================================
+       MODAL - Ventana emergente de detalle
+  ============================================== -->
+  <div class="overlay" id="overlay" onclick="cerrarModal(event)">
+    <div class="modal" id="modal">
+
+      <!-- Cabecera del modal -->
+      <div class="modal-header">
+        <h2 id="m-nombre"></h2>
+        <button class="btn-cerrar" onclick="cerrarModal(true)">✕</button>
+      </div>
+
+      <!-- Emoji / imagen del producto -->
+      <div class="modal-img" id="m-emoji"></div>
+
+      <!-- Cuerpo con info detallada -->
+      <div class="modal-body">
+        <div class="modal-cat" id="m-cat"></div>
+        <p class="modal-desc" id="m-desc"></p>
+
+        <!-- Grilla de especificaciones técnicas -->
+        <div class="modal-specs-grid" id="m-specs"></div>
+
+        <!-- Precio y botón de compra -->
+        <div class="modal-footer">
+          <div class="modal-precio" id="m-precio"></div>
+          <button class="btn-comprar" id="m-btn-agregar" onclick="agregarAlCarritoDesdeModal()">
+            Agregar al carrito
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- FORMULARIO DE AGREGAR PRODUCTO -->
+  <!-- El botón flotante y el modal vienen de agregar_producto.html -->
+  <!-- Copia el contenido de agregar_producto.html aquí debajo -->
+
+  <!-- ══ BOTÓN FLOTANTE ══ -->
+  <button class="btn-agregar-flotante" id="btn-agregar-flotante" 
+        onclick="abrirFormProducto()" style="display:none">
+    <span class="icono">＋</span>
+    Agregar Producto
+  </button>
+
+  <!-- ══ MODAL FORMULARIO ══ -->
+  <div class="ap-overlay" id="ap-overlay" onclick="cerrarSiEsFondo(event)">
+    <div class="ap-modal">
+      <div class="ap-header">
+        <h2>NUEVO <span>PRODUCTO</span></h2>
+        <button class="ap-btn-cerrar" onclick="cerrarFormProducto()">✕</button>
+      </div>
+      <div class="ap-alerta" id="ap-alerta"></div>
+      <div class="ap-grupo"><label>Nombre del producto *</label><input type="text" id="ap-nombre" placeholder="Ej: Laptop HP Victus 15" oninput="limpiarApErr(this)"/><div class="ap-err" id="ap-nombre-err">El nombre es obligatorio (mínimo 3 caracteres)</div></div>
+      <div class="ap-grupo"><label>Marca *</label><input type="text" id="ap-marca" placeholder="Ej: HP, Apple, Lenovo" oninput="limpiarApErr(this)"/><div class="ap-err" id="ap-marca-err">La marca es obligatoria</div></div>
+      <div class="ap-grupo"><label>Categoría *</label><select id="ap-categoria" onchange="limpiarApErr(this)"><option value="">-- Selecciona --</option><option value="laptop">💻 Laptops</option><option value="pc">🖥️ PC</option><option value="impresora">🖨️ Impresoras</option><option value="periférico">🖱️ Periféricos</option></select><div class="ap-err" id="ap-categoria-err">Selecciona una categoría</div></div>
+      <div class="ap-grupo"><label>Descripción *</label><textarea id="ap-descripcion" rows="3" placeholder="Describe el producto..." oninput="limpiarApErr(this)"></textarea><div class="ap-err" id="ap-descripcion-err">Mínimo 10 caracteres</div></div>
+      <div class="ap-fila2"><div class="ap-grupo"><label>Precio (USD) *</label><input type="number" id="ap-precio" min="0.01" step="0.01" placeholder="Ej: 899.00" oninput="limpiarApErr(this)"/><div class="ap-err" id="ap-precio-err">Ingresa un precio válido</div></div><div class="ap-grupo"><label>Precio anterior (opcional)</label><input type="number" id="ap-precio-antes" min="0" step="0.01" placeholder="Ej: 1099.00"/></div></div>
+      <div class="ap-grupo">
+  <label>Imagen del producto</label>
+  <input type="file" id="ap-imagen" accept="image/jpeg,image/png,image/webp"
+         onchange="previsualizarImagen(this)"/>
+  <div id="ap-imagen-preview" style="margin-top:10px; display:none;">
+    <img id="ap-preview-img" src="" alt="Preview"
+         style="max-width:100%; border-radius:8px; border:2px solid var(--gris-borde);"/>
+  </div>
+</div>
+      <div class="ap-grupo"><label>Etiqueta (opcional)</label><select id="ap-badge"><option value="">Sin etiqueta</option><option value="nuevo">✨ Nuevo</option><option value="oferta">🔥 Oferta</option></select></div>
+      <div class="ap-grupo"><label>Especificaciones técnicas</label><div class="ap-specs-lista" id="ap-specs-lista"></div><button type="button" class="ap-btn-add-spec" onclick="agregarFilaSpec()">＋ Agregar especificación</button></div>
+      <button class="ap-btn-guardar" id="ap-btn-guardar" onclick="guardarProducto()">💾 Guardar Producto en la Base de Datos</button>
+    </div>
+  </div>
+
+  <!-- Archivo JavaScript (siempre al final del body) -->
+ <!-- MODAL MI CUENTA -->
+  <div class="mc-overlay" id="mc-overlay" onclick="cerrarMiCuenta(event)">
+    <div class="mc-modal">
+
+      <div class="mc-header">
+        <h2>MI <span>CUENTA</span></h2>
+        <button class="btn-cerrar" onclick="cerrarMiCuenta()">✕</button>
+      </div>
+
+      <!-- Perfil -->
+      <div class="mc-perfil">
+        <div class="mc-avatar">👤</div>
+        <div class="mc-perfil-info">
+          <h3 id="mc-saludo">¡Hola!</h3>
+          <p id="mc-correo">correo@ejemplo.com</p>
+          <span class="mc-rol" id="mc-rol-badge">Cliente</span>
+        </div>
+      </div>
+
+      <!-- Datos -->
+      <div class="mc-datos">
+        <div class="mc-dato">
+          <div class="lbl">Nombre completo</div>
+          <div class="val" id="mc-nombre">—</div>
+        </div>
+        <div class="mc-dato">
+          <div class="lbl">Correo electrónico</div>
+          <div class="val" id="mc-correo-dato">—</div>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="mc-acciones">
+        <button class="mc-btn-accion" onclick="window.location.href='carrito.html'">
+          <span class="mc-ico">🛒</span> Mis Pedidos
+        </button>
+        <button class="mc-btn-accion" onclick="abrirCambiarPassword()">
+  <span class="mc-ico">🔑</span> Cambiar contraseña
+</button>
+        <button class="mc-btn-accion mc-btn-peligro" onclick="cerrarSesion()">
+          <span class="mc-ico">🔓</span> Cerrar sesión
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <div class="cp-overlay" id="cp-overlay" onclick="cerrarCambiarPassword(event)">
+  <div class="cp-modal">
+
+    <div class="cp-header">
+      <h2>CAMBIAR <span>CONTRASEÑA</span></h2>
+      <button class="btn-cerrar" onclick="cerrarCambiarPassword(true)">✕</button>
+    </div>
+
+    <div class="cp-alerta" id="cp-alerta"></div>
+
+    <div class="cp-grupo">
+  <label>Contraseña actual *</label>
+  <div style="position:relative;">
+    <input type="password" id="cp-actual" placeholder="Tu contraseña actual"
+           style="padding-right:42px;"/>
+    <span onclick="togglePass('cp-actual', this)" 
+          style="position:absolute; right:12px; top:50%; transform:translateY(-50%); 
+                 cursor:pointer; font-size:1.1rem; user-select:none;">👁️</span>
+  </div>
+</div>
+
+<div class="cp-grupo">
+  <label>Nueva contraseña *</label>
+  <div style="position:relative;">
+    <input type="password" id="cp-nueva" placeholder="Mínimo 6 caracteres"
+           style="padding-right:42px;"/>
+    <span onclick="togglePass('cp-nueva', this)"
+          style="position:absolute; right:12px; top:50%; transform:translateY(-50%); 
+                 cursor:pointer; font-size:1.1rem; user-select:none;">👁️</span>
+  </div>
+</div>
+
+<div class="cp-grupo">
+      <label>Confirmar nueva contraseña *</label>
+      <div style="position:relative;">
+        <input type="password" id="cp-confirma" placeholder="Repite la nueva contraseña"
+               style="padding-right:42px;"/>
+        <span onclick="togglePass('cp-confirma', this)"
+              style="position:absolute; right:12px; top:50%; transform:translateY(-50%); 
+                     cursor:pointer; font-size:1.1rem; user-select:none;">👁️</span>
+      </div>
+    </div>
+
+    <button class="cp-btn-guardar" id="cp-btn-guardar" onclick="guardarNuevaPassword()">
+      🔑 Cambiar Contraseña
+    </button>
+
+  </div>
+</div>
+
+<!-- MODAL EDITAR PRODUCTO -->
+<div class="ap-overlay" id="ed-overlay" onclick="cerrarEditar(event)">
+  <div class="ap-modal">
+    <div class="ap-header">
+      <h2>EDITAR <span>PRODUCTO</span></h2>
+      <button class="ap-btn-cerrar" onclick="cerrarEditar(true)">✕</button>
+    </div>
+
+    <div class="ap-alerta" id="ed-alerta"></div>
+    <input type="hidden" id="ed-id"/>
+
+    <div class="ap-grupo">
+      <label>Nombre del producto *</label>
+      <input type="text" id="ed-nombre" placeholder="Ej: Laptop HP Victus 15"/>
+    </div>
+
+    <div class="ap-grupo">
+      <label>Marca *</label>
+      <input type="text" id="ed-marca" placeholder="Ej: HP, Apple, Lenovo"/>
+    </div>
+
+    <div class="ap-grupo">
+      <label>Categoría *</label>
+      <select id="ed-categoria">
+        <option value="">-- Selecciona --</option>
+        <option value="laptop">💻 Laptops</option>
+        <option value="pc">🖥️ PC</option>
+        <option value="impresora">🖨️ Impresoras</option>
+        <option value="periférico">🖱️ Periféricos</option>
+      </select>
+    </div>
+
+    <div class="ap-grupo">
+      <label>Descripción *</label>
+      <textarea id="ed-descripcion" rows="3" placeholder="Describe el producto..."></textarea>
+    </div>
+
+    <div class="ap-fila2">
+      <div class="ap-grupo">
+        <label>Precio (USD) *</label>
+        <input type="number" id="ed-precio" min="0.01" step="0.01" placeholder="Ej: 899.00"/>
+      </div>
+      <div class="ap-grupo">
+        <label>Precio anterior (opcional)</label>
+        <input type="number" id="ed-precio-antes" min="0" step="0.01" placeholder="Ej: 1099.00"/>
+      </div>
+    </div>
+
+    <div class="ap-grupo">
+      <label>Imagen del producto</label>
+      <input type="file" id="ed-imagen" accept="image/jpeg,image/png,image/webp"
+             onchange="previsualizarImagenEditar(this)"/>
+      <div id="ed-imagen-preview" style="margin-top:10px; display:none;">
+        <img id="ed-preview-img" src="" alt="Preview"
+             style="max-width:100%; border-radius:8px; border:2px solid var(--gris-borde);"/>
+      </div>
+    </div>
+
+    <div class="ap-grupo">
+      <label>Etiqueta (opcional)</label>
+      <select id="ed-badge">
+        <option value="">Sin etiqueta</option>
+        <option value="nuevo">✨ Nuevo</option>
+        <option value="oferta">🔥 Oferta</option>
+      </select>
+    </div>
+
+    <div class="ap-grupo">
+      <label>Especificaciones técnicas</label>
+      <div class="ap-specs-lista" id="ed-specs-lista"></div>
+      <button type="button" class="ap-btn-add-spec"
+              onclick="agregarFilaSpecEditar('','')">＋ Agregar especificación</button>
+    </div>
+
+    <button class="ap-btn-guardar" id="ed-btn-guardar" onclick="guardarEdicion()">
+      💾 Guardar Cambios
+    </button>
+     </div>
+</div>
+  <script src="app.js"></script>
+  <script src="agregar_producto.js"></script>
+  <script src="mi_cuenta.js"></script>
+  <script src="cambiar_password.js"></script>
+  <script src="admin_productos.js"></script>
+  <script>
+</script>
+</body>
+</html>
